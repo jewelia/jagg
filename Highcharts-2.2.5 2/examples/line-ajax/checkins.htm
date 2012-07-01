@@ -1,6 +1,6 @@
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-		<title>Highcharts Example</title>
+		<title>Checkins!</title>
 
 		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
 		<script type="text/javascript">
@@ -8,8 +8,8 @@ $(function () {
     var chart;
     var bucket_size = 25920000; // a month.
     $(document).ready(function() {
-        url = '"http://static.adzerk.net/Advertisers/bd294ce7ff4c43b6aad4aa4169fb819b.jpg" ';
-        var images = [];
+        var lats= [];
+        var longs = [];
         var links = [];
         // define the options
         var options = {
@@ -81,10 +81,7 @@ $(function () {
                     '<td style="text-align: right"><b>{point.y} EUR</b></td></tr>',
                     footerFormat: '</table>',
                     formatter: function() {
-                        image = '"' + images[this.x] + '" ';
-                        link = '"' + links[this.x] + '"'; 
-                        str = '<a href=' + link + '><img src=' + image + 'title="" alt="" border="0" height="250" width="220"></a>';
-                        return str;
+                     return '<iframe width="425" height="350" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="https://maps.google.com/maps?q=' + lats[this.x] + ',+' + longs[this.x] + '&amp;ie=UTF8&amp;t=m&amp;z=14&amp;ll=' + lats[this.x] + ',' + longs[this.x] + '&amp;output=embed"></iframe><br /><small><a href="https://maps.google.com/maps?q=' + lats[this.x] + ',+' + longs[this.x] + '&amp;ie=UTF8&amp;t=m&amp;z=14&amp;ll=' + lats[this.x] + ',' + longs[this.x] + '&amp;source=embed" style="color:#0000FF;text-align:left">View Larger Map</a></small>';
                     },
                     valueDecimals: 2
                 },    
@@ -102,7 +99,7 @@ $(function () {
                                     },
                                     headingText: this.series.name,
                                     maincontentText: Highcharts.dateFormat('%A, %b %e, %Y', this.x) +':<br/> '+
-                                        this.y + ' photos. ' + '<a href="' + links[this.x] + '">original link</a>',
+                                        this.y + ' check-in. ' +  '<a href="' + links[this.x] + '">original link</a>',
                                     width: 200
                                 });
                             }
@@ -130,10 +127,9 @@ $(function () {
         // to the options and timeiate the chart.
         // This data is obtained by exporting a GA custom report to TSV.
         // http://api.jquery.com/jQuery.get/
-        photos =[],
-        checkIns = [];
+        checkins = [];
 
-       jQuery.getJSON('../../../julia_photo_json.json', null, function(text) {
+       jQuery.getJSON('../../../julia_checkins_json.json', null, function(text) {
             i = 0;
             time = text[0][0]
             counter = 0; 
@@ -141,49 +137,18 @@ $(function () {
                 if (text[i][0] < (time + bucket_size)) {
                    counter++; 
                 } else {
-                    photos.push([time, counter]);
+                    checkins.push([time, counter]);
                     counter = 1;
                 }
                 key = text[i][0];
-                images[key] = text[i][1].data;
+                lats[key] = text[i][1].lat;
+                longs[key] = text[i][1].lng;
                 links[key] = text[i][1].link;
                 time = key;
                 i++;
             }
-                // photos.push([text[i][0], text[i][1].width]);
-                // checkIns.push([text[i][0], text[i][1].height]);
-                // images.push([text[i][0], text[i][1].link]);
-                // console.log(text[i][1].link);
-                console.log(photos.length);
-                // console.log(checkIns.length);
-                options.series[0].data = photos;
-                // options.series[1].data = checkIns; 
+                options.series[0].data = checkins;
                 chart = new Highcharts.Chart(options);
-/*
-                jQuery.getJSON('../../../julia_status_json.json', null, function(status) {
-                    i = 0;
-                    time = status[0][0];
-                    console.log(time);
-                    counter = 0; 
-                    while(i<status.length) {
-                        if (status[i][0] < (time + bucket_size)) {
-                           counter++; 
-                        } else {
-                            checkIns.push([time, counter]);
-                            console.log(time + ", " + counter);
-                            counter = 0;
-                        }
-                        time = status[i][0];
-                        i++;
-                    }
-                        options.series[1].data = checkIns;
-                        chart = new Highcharts.Chart(options);
-                        }
-             ) */
-            // var date, source, link, type, numb_likes, data, width, height;
-         
-
-            // push stuff to photos and checkIns based on json.
             });
         });
 });
