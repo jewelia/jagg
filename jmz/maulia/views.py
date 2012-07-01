@@ -57,9 +57,9 @@ def singly_authorize(request):
     api_request_checkins = SINGLY_CHECKINS + '?access_token=' + access_token
     api_request_status = SINGLY_STATUS + '?access_token=' + access_token
 
-    all_api_calls = {'profile': api_request_profiles, 
-                     'photo' : api_request_photos, 
-                     'checkin': api_request_checkins, 
+    all_api_calls = {'profile': api_request_profiles,
+                     'photo' : api_request_photos,
+                     'checkin': api_request_checkins,
                      'status' : api_request_status}
 
     scrubbed_photo_data = []
@@ -78,18 +78,13 @@ def singly_authorize(request):
         json_array = []
         count = 0
         if key != 'profile':
+
+            #if key == 'status':
+                #print a_json
+
             while count < len(a_json):
                 oembed_obj = a_json[count]['oembed']
                 date_obj = a_json[count]['at']
-
-                provider_name = ''
-                type = ''
-                provider_url = ''
-                image_location = ''
-                height = ''
-                width = ''
-                link = ''
-                source = ''
 
                 try:
                     if oembed_obj['provider_name']:
@@ -98,22 +93,45 @@ def singly_authorize(request):
                     source = ''
 
                 try:
-                    if oembed_obj['type']:
-                        type = oembed_obj['type']
+                    #if oembed_obj['type']:
+                    #    type = oembed_obj['type']
+                    if a_json[count]['idr'].find('twitter') > 0:
+                        type = 'twitter'
+                    elif a_json[count]['idr'].find('facebook') > 0:
+                        type = 'facebook'
+                    elif a_json[count]['idr'].find('linkedin') > 0:
+                        type = 'linkedin'
+                    elif a_json[count]['idr'].find('foursquare') > 0:
+                        type = 'foursquare'
+                    elif a_json[count]['idr'].find('instagram') > 0:
+                        type = 'instagram'
+
                 except KeyError:
                     type = ''
 
-                try: 
+                try:
                     if oembed_obj['provider_url']:
                         link = oembed_obj['provider_url']
+                    elif a_json[count]['data']['actions'][0]['name']:
+                        if a_json[count]['data']['actions'][0]['name'] == 'Comment':
+                            link = a_json[count]['data']['actions'][0]['link']
+                    elif a_json[count]['idr'].find('twitter') > 0:
+                        link = 'http://www.twitter.com/' + a_json[count]['data']['user']['screen_name'] + '/' + a_json[count]['data']['id_str']
+
                 except KeyError:
                     link = ''
-                
+
                 try:
-                    if oembed_obj['url']:
-                        image_location = oembed_obj['url']
+                    if key == 'photo':
+                        if oembed_obj['url']:
+                            data = oembed_obj['url']
+                    elif key == 'status': 
+                        if oembed_obj['text']:
+                            print "found text " + str(oembed_obj)
+                            data = oembed_obj['text']
+
                 except KeyError:
-                    image_location = ''
+                    data = ''
 
                 try:
                     if oembed_obj['height']:
@@ -126,13 +144,13 @@ def singly_authorize(request):
                         width = oembed_obj['width']
                 except KeyError:
                     width = ''
-                
+
                 data = {
                     #'date' : date_obj,
                     'source' : source,
                     'type' : type,
                     'link' : link,
-                    'image_location' : image_location,
+                    'data' : data,
                     'height' : height,
                     'width' : width,
                 }
@@ -143,110 +161,23 @@ def singly_authorize(request):
 
             if key == 'photo':
                 scrubbed_photo_data = json.JSONEncoder().encode(json_array)
+                num_photos = str(len(json_array))
             if key == 'profile':
                 scrubbed_profile_data = json.JSONEncoder().encode(json_array)
+                num_profile = str(len(json_array))
             if key == 'checkin':
                 scrubbed_checkin_data = json.JSONEncoder().encode(json_array)
+                num_checkins= str(len(json_array))
             if key == 'status':
                 scrubbed_status_data = json.JSONEncoder().encode(json_array)
-    
+                num_status = str(len(json_array))
+
     return render_to_response('data.html',
-                              {'photo_json' : scrubbed_photo_data,
+                              {'num_photos' : num_photos,
+                               'num_status' : num_status,
+                               'photo_json' : scrubbed_photo_data,
                                'profile_json' : scrubbed_profile_data,
                                'checkin_json' : scrubbed_checkin_data,
                                'status_json' : scrubbed_status_data}
                               )
-    
-
-'''
-    #2 Make HTTP Requests for checkin data
-    request_photos = urllib2.Request(api_request_photos)
-    response_photos = urllib2.urlopen(request_photos)
-    
-    #3 Read checkin data from HTTP Request
-    photos = response_photos.read()
-    
-    #4 Load checkins into json parser
-    photo_json = json.loads(photos)
-
-    print photo_json[0]['oembed']
-    print photo_json[0]['at']
-
-    photos_array = []
-    count = 0
-    while count < len(photo_json):
-        oembed_obj = photo_json[count]['oembed']
-        date_obj = photo_json[count]['at']
-        
-        data = {
-            #'date' : date_obj,
-            'source' : oembed_obj['provider_name'],
-            'type' : oembed_obj['type'],
-            'link' : oembed_obj['provider_url'],
-            'image_location' : oembed_obj['url'],
-            'height' : oembed_obj['height'],
-            'width' : oembed_obj['width'],
-        }
-        photos_tuple = [date_obj, data]
-        photos_tuple.sort()
-        photos_array.append(photos_tuple)
-        count += 1
-
-    scrubbed_photo_data = json.JSONEncoder().encode(photos_array)
-    #print "BEGIN JSON"
-    #print scrubbed_data
-
-    #3 Write profile data to file
-    #sfile = open(settings.FILE_WRITE_PATH + 'julia-photos.json-v2', 'w')
-    #sfile.write(photos)
-    #sfile.close()
-
-    #2 Make HTTP Re`14yyquests for checkin data
-    request_checkins = urllib2.Request(api_request_checkins)
-    response_checkins = urllib2.urlopen(request_checkins)
-    
-    #3 Read checkin data from HTTP Request
-    checkins = response_checkins.read()
-    
-    #4 Load checkins into json parser
-    checkin_json = json.loads(checkins)
-
-    #3 Write profile data to file
-    sfile1 = open(settings.FILE_WRITE_PATH + 'julia-checkins-v2.json', 'w')
-    sfile1.write(json.dumps(checkin_json))
-    sfile1.close()
-
-    #2 Make HTTP Requests for checkin data
-    request_statuses = urllib2.Request(api_request_status)
-    response_statuses = urllib2.urlopen(request_statuses)
-    
-    #3 Read checkin data from HTTP Request
-    statuses = response_statuses.read()
-    
-    #4 Load checkins into json parser
-    statuses_json = json.loads(statuses)
-
-    #3 Write profile data to file
-    sfile2 = open(settings.FILE_WRITE_PATH + 'julia-statuses-v2.json', 'w')
-    sfile2.write(json.dumps(statuses_json))
-    sfile2.close()
-
-    #2 Make HTTP Re`14yyquests for checkin data
-    request_profiles = urllib2.Request(api_request_profiles)
-    response_profiles = urllib2.urlopen(request_profiles)
-    
-    #3 Read checkin data from HTTP Request
-    profiles = response_profiles.read()
-    
-    #4 Load checkins into json parser
-    checkin_profiles = json.loads(profiles)
-
-    #3 Write profile data to file
-    sfile1 = open(settings.FILE_WRITE_PATH + 'julia-profiles-v2.json', 'w')
-    sfile1.write(json.dumps(checkin_profiles))
-    sfile1.close()
-
-    '''
-
-    #return HttpResponse('<h1>Page was found</h1>')
 
