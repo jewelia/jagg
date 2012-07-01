@@ -1,0 +1,31 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="/static/css/bootstrap.css">
+    <link rel="stylesheet" href="/static/js/bootstrap.min.js">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <title>Julia and Maggie</title>
+</head>
+<body>
+    <h1> PHOTO JSON {{ num_photos }}</h1>
+    <ul class="thumbnails">
+    {% for image in images_array %}
+        <li class="span3">
+            <a href="{{ image }}" class="thumbnail">
+                <img src="{{ image }}" alt="" height="50px" >
+            </a>
+        </li>
+    {% endfor %}
+    </ul>
+    {{ photo_json }}
+    <h1> PROFILE JSON </h1>
+    {{ profile_json }}
+    <h1> CHECKIN JSON {{ num_checkins }} </h1>
+    {{ checkin_json }}
+    <h1> STATUS JSON {{ num_status }}</h1>
+    {{ status_json }}
+</body>
+</html>
+
