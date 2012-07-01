@@ -1,14 +1,10 @@
-from django.http import HttpResponse
 from django.conf import settings
 from django.shortcuts import render_to_response
 
 import urllib
 import urllib2
 import urlparse
-import httplib2
 import json
-from urlparse import parse_qsl, urlparse
-from urllib import urlencode
 
 
 def connect_to_service(request):
@@ -90,9 +86,10 @@ def singly_authorize(request):
                 oembed_obj = a_json[count]['oembed']
                 date_obj = a_json[count]['at']
                 if str(date_obj).startswith('12', 0):
-                    date_list = list(str(date_obj))
-                    date_list[0:1] = '13'
-                    date_obj = ''.join(date_list)
+                    date_obj += 1286370912101
+                    #date_list = list(str(date_obj))
+                    #date_list[0:1] = '13'
+                    #date_obj = ''.join(date_list)
 
                 try:
                     if oembed_obj['provider_name']:
