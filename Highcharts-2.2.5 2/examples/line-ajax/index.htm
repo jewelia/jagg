@@ -94,9 +94,11 @@ $(function () {
                                     },
                                     headingText: this.series.name,
                                     maincontentText: Highcharts.dateFormat('%A, %b %e, %Y', this.x) +':<br/> '+
-                                        this.y +' visits',
+                                        this.y +' visits' + 'BOOM',
                                     width: 200
                                 });
+                              console.log(this.x);
+                              console.log(this.y);
                             }
                         }
                     },
@@ -107,13 +109,13 @@ $(function () {
             },
     
             series: [{
-                name: 'All visits',
+                name: 'Photos',
                 lineWidth: 4,
                 marker: {
                     radius: 4
                 }
             }, {
-                name: 'New visitors'
+                name: 'Check-ins'
             }]
         };
     
@@ -122,6 +124,7 @@ $(function () {
         // to the options and initiate the chart.
         // This data is obtained by exporting a GA custom report to TSV.
         // http://api.jquery.com/jQuery.get/
+
         jQuery.get('analytics.tsv', null, function(tsv, state, xhr) {
             var lines = [],
                 listen = false,
@@ -160,6 +163,9 @@ $(function () {
                         date,
                         parseInt(line[2].replace(',', ''), 10)
                     ]);
+                    console.log("date" + date);
+                    console.log(allVisits[0]);
+                    console.log(newVisitors[0]);
                 }
             });
     
@@ -167,7 +173,21 @@ $(function () {
             options.series[1].data = newVisitors;
     
             chart = new Highcharts.Chart(options);
-        });
+        }); 
+/*
+
+    photos =[],
+    checkIns = [];
+
+    // parse Json into objects
+    var date, source, link, type, numb_likes, image_location, width, height;
+ 
+
+    // push stuff to photos and checkIns based on json.
+    options.series[0].data = photos;
+    options.series[1].data = checkIns; 
+    chart = new Highcharts.Chart(options);
+*/
     });
     
 });
