@@ -166,6 +166,8 @@ def singly_authorize(request):
         count = 0
         if key != 'profile':
 
+            #if key == 'photo':
+            #    print a_json
             #if key == 'checkin':
             #    print a_json
 
@@ -173,16 +175,14 @@ def singly_authorize(request):
                 oembed_obj = a_json[count]['oembed']
                 date_obj = a_json[count]['at']
                 if str(date_obj).startswith('12', 0):
-                    print "adjusting " + str(date_obj)
                     date_obj += 13744850000
                     #date_list = list(str(date_obj))
                     #date_list[0:1] = '13'
                     #date_obj = ''.join(date_list)
-                if key == 'photo':
-                    print date_obj
-                if date_obj > '1341295445':
-                    continue
+                #if key == 'photo':
+                #    print date_obj
 
+                
                 try:
                     if oembed_obj['provider_name']:
                         source = oembed_obj['provider_name']
@@ -220,7 +220,13 @@ def singly_authorize(request):
 
                 try:
                     if key == 'photo':
-                        if oembed_obj['provider_url']:
+                        if type == 'twitter':
+                            link = 'http://www.twitter.com/' + a_json[count]['data']['user']['screen_name'] + '/status/' + a_json[count]['data']['id_str']
+
+                        #if a_json[count]['data']['entities']['media'][0]['media_url']:
+                        #    link =  a_json[count]['data']['entities']['media'][0]['media_url']
+                        #    print "LINK " + link
+                        elif oembed_obj['provider_url']:
                             link = oembed_obj['provider_url']
                     elif key == 'status':
                         if type == 'facebook':

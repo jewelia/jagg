@@ -162,48 +162,14 @@
                 time = key;
                 i++;
             }
-                // photos.push([text[i][0], text[i][1].width]);
-                // checkIns.push([text[i][0], text[i][1].height]);
-                // images.push([text[i][0], text[i][1].link]);
-                // console.log(text[i][1].link);
-                console.log(photos.length);
-                // console.log(checkIns.length);
                 options.series[0].data = photos;
-                // options.series[1].data = checkIns; 
                 chart = new Highcharts.Chart(options);
-/*
-                jQuery.getJSON('../../../julia_status_json.json', null, function(status) {
-                    i = 0;
-                    time = status[0][0];
-                    console.log(time);
-                    counter = 0; 
-                    while(i<status.length) {
-                        if (status[i][0] < (time + bucket_size)) {
-                           counter++; 
-                        } else {
-                            checkIns.push([time, counter]);
-                            console.log(time + ", " + counter);
-                            counter = 0;
-                        }
-                        time = status[i][0];
-                        i++;
-                    }
-                        options.series[1].data = checkIns;
-                        chart = new Highcharts.Chart(options);
-                        }
-             ) */
-            // var date, source, link, type, numb_likes, data, width, height;
-         
-
-            // push stuff to photos and checkIns based on json.
             
         });
-});
-                </script>
-            </head>
-            <body>
-
+    });
+    </script>
+    </head>
+        <body>
         <div id="container" style="min-width: 400px; height: 400px; margin: 0 auto"></div>
-
-            </body>
-        </html>
+        </body>
+</html>
