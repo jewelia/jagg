@@ -16,13 +16,13 @@
             domModal.modal({
                 keyboard: false,
                 backdrop: 'static'
-                });
+                %]);
             domModal.modal('show')
 
             $('#btnClose').live('click', function(){
                 domModal.modal('hide');
-            });
-    });
+            %]);
+    %]);
 </script>
 </head>
 
@@ -34,11 +34,23 @@
     <div id="modal-interior" class="modal-body">
         <h3>Let's pick your poisons:</h3>
         <br />
+         {% if linkedin %]
+         <a class='btn btn-primary' href='https://api.singly.com/oauth/authorize?client_id=55a4cc03aeb47566804a3dc210af2548&redirect_uri=http://localhost:8000/singly/callback&service=linkedin' disabled='disabled'> LinkedIn </a>
+         {% else  %]
          <a class='btn btn-primary' href='https://api.singly.com/oauth/authorize?client_id=55a4cc03aeb47566804a3dc210af2548&redirect_uri=http://localhost:8000/singly/callback&service=linkedin'> LinkedIn </a>
+         
+         {% if linkedin %]
          <a class='btn btn-primary' href='https://api.singly.com/oauth/authorize?client_id=55a4cc03aeb47566804a3dc210af2548&redirect_uri=http://localhost:8000/singly/callback&service=instagram'> Instagram </a>
+         {% else  %]
+         {% if linkedin %]
          <a class='btn btn-primary' href='https://api.singly.com/oauth/authorize?client_id=55a4cc03aeb47566804a3dc210af2548&redirect_uri=http://localhost:8000/singly/callback&service=twitter'> Twitter </a>
+         {% else  %]
+         {% if linkedin %]
          <a class='btn btn-primary' href='https://api.singly.com/oauth/authorize?client_id=55a4cc03aeb47566804a3dc210af2548&redirect_uri=http://localhost:8000/singly/callback&service=facebook'> Facebook </a>
+         {% else  %]
+         {% if linkedin %]
          <a class='btn btn-primary' href='https://api.singly.com/oauth/authorize?client_id=55a4cc03aeb47566804a3dc210af2548&redirect_uri=http://localhost:8000/singly/callback&service=foursquare'> Foursquare </a>
+         {% else  %]
     </div>
     <div class="modal-footer">
     <a id="btnClose" href="/accounts/start/" class="btn btn-primary">It's cool, I'm ready for the data!</a>

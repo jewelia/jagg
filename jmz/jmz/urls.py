@@ -6,8 +6,9 @@ from django.contrib import admin
 admin.autodiscover()
 
 urlpatterns = patterns('maulia.views',
-                       url(r'^$', 'connect_to_service', name='home'),
-                       url(r'^singly/callback/$', 'singly_authorize', name='home'),
+                       url(r'^$', 'index', name='home'),
+                       url(r'singly/callback/^$', 'connect_to_service', name='home'),
+                       url(r'^data/$', 'singly_authorize', name='home'),
                        url(r'^admin/', include(admin.site.urls)),
 )
 urlpatterns += patterns('',

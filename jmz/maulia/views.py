@@ -5,10 +5,18 @@ import urllib
 import urllib2
 import json
 
-code = ''
+singly_code = ''
+
+def index(request):
+    return render_to_response('singly.html',
+                              { 'instagram': False,
+                               'facebook' : False,
+                               'linkedin' : False,
+                               'foursquare' : False,
+                               'twitter' : False
+                               })
 
 def connect_to_service(request):
-    '''
     SINGLY_ACCESS_TOKEN_URL = 'https://api.singly.com/oauth/access_token'
     SINGLY_PROFILES = 'https://api.singly.com/v0/profiles'
 
@@ -39,11 +47,6 @@ def connect_to_service(request):
     
     all_api_calls = {'profile': api_request_profiles}
 
-    facebook = False
-    twitter = False
-    linkedin = False
-    foursquare = False
-
     for key in all_api_calls.keys():
         call = all_api_calls[key]
 
@@ -60,12 +63,35 @@ def connect_to_service(request):
                     twitter = True
             except KeyError:
                 twitter = False
-
+            try:
+                if a_json['facebook']:
+                    facebook = True
+            except KeyError:
+                facebook = False
             count += 1
+            try:
+                if a_json['linkedin']:
+                    linkedin = True
+            except KeyError:
+                linkedin = False
+            try:
+                if a_json['foursquare']:
+                    foursquare = True
+            except KeyError:
+                foursquare = False
+            try:
+                if a_json['instagram']:
+                    instagram = True
+            except KeyError:
+                instagram = False
 
-    #1 Fetch Profile Data
-    '''
-    return render_to_response('singly.html')
+    return render_to_response('singly.html',
+                              { 'instagram': instagram,
+                               'facebook' : facebook,
+                               'linkedin' : linkedin,
+                               'foursquare' : foursquare,
+                               'twitter' : twitter
+                               })
 
 def singly_authorize(request):
     SINGLY_ACCESS_TOKEN_URL = 'https://api.singly.com/oauth/access_token'
