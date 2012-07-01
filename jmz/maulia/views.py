@@ -22,6 +22,8 @@ def singly_authorize(request):
     SINGLY_CHECKINS = 'https://api.singly.com/v0/types/checkins'
     SINGLY_STATUS = 'https://api.singly.com/v0/types/statuses'
 
+    FOURSQUARE = 'https://api.singly.com/v0/services/foursquare/checkins'
+
     # Get singly access code
     code = request.GET.get("code")
     print("OAuth code is %s" % (code, ))
@@ -56,11 +58,13 @@ def singly_authorize(request):
     api_request_photos = SINGLY_PHOTOS + '?access_token=' + access_token
     api_request_checkins = SINGLY_CHECKINS + '?access_token=' + access_token
     api_request_status = SINGLY_STATUS + '?access_token=' + access_token
+    #api_request_foursquare = FOURSQUARE + '?access_token=' + access_token
 
     all_api_calls = {'profile': api_request_profiles,
                      'photo' : api_request_photos,
                      'checkin': api_request_checkins,
-                     'status' : api_request_status}
+                     'status' : api_request_status,}
+                     #'foursquare' : api_request_foursquare}
 
     scrubbed_photo_data = []
     scrubbed_profile_data= []
@@ -79,12 +83,14 @@ def singly_authorize(request):
         count = 0
         if key != 'profile':
 
-            if key == 'checkin':
-                print a_json
+            #if key == 'checkin':
+            #    print a_json
 
             while count < len(a_json):
                 oembed_obj = a_json[count]['oembed']
                 date_obj = a_json[count]['at']
+                if date_obj.startswith('12', 0):
+                    date_list = list(date_obj)
 
                 try:
                     if oembed_obj['provider_name']:
@@ -113,14 +119,14 @@ def singly_authorize(request):
                     if key == 'photo':
                         if oembed_obj['provider_url']:
                             link = oembed_obj['provider_url']
-                    if key == 'status':
+                    elif key == 'status':
                         if type == 'facebook':
                             if a_json[count]['data']['actions'][0]['name']:
                                 if a_json[count]['data']['actions'][0]['name'] == 'Comment':
                                     link = a_json[count]['data']['actions'][0]['link']
                         elif a_json[count]['idr'].find('twitter') > 0:
                             link = 'http://www.twitter.com/' + a_json[count]['data']['user']['screen_name'] + '/status/' + a_json[count]['data']['id_str']
-                    if key == 'checkin':
+                    elif key == 'checkin' or key == 'foursquare':
                         if type == 'foursquare':
                             link = 'https://foursquare.com/v/' + (a_json[count]['venue']['name']).replace(' ', '-') + "/" + a_json[count]['venue']['id']
                         if type == 'facebook':
@@ -136,7 +142,7 @@ def singly_authorize(request):
                     elif key == 'status': 
                         if oembed_obj['text']:
                             data = oembed_obj['text']
-                    elif key == 'checkin':
+                    elif key == 'checkin' or key == 'foursquare':
                         if oembed_obj['title']:
                             data = oembed_obj['title']
 
@@ -187,6 +193,7 @@ def singly_authorize(request):
     return render_to_response('data.html',
                               {'num_photos' : num_photos,
                                'num_status' : num_status,
+                               'num_checkins' : num_checkins,
                                'photo_json' : scrubbed_photo_data,
                                'profile_json' : scrubbed_profile_data,
                                'checkin_json' : scrubbed_checkin_data,
