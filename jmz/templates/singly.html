@@ -2,18 +2,47 @@
 
 <html lang="en">
 <head>
-    <link rel="stylesheet" href="/static/css/bootstrap.css">
-    <link rel="stylesheet" href="/static/css/bootstrap.min.js">
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
-    <title>Julia and Maggie</title>
+    <title>Why, Hello There.</title>
+    <link rel="stylesheet" href="/static/css/bootstrap.css">
+    <script type="text/javascript"  href="/static/js/bootstrap.min.js"></script>
+    <script type="text/javascript"  href="/static/js/bootstrap-modal.js"></script>
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script type="text/javascript" src="http://current.bootstrapcdn.com/bootstrap-v204/js/bootstrap.js"></script>
+    <script type="text/javascript">
+    $(document).ready(function () {
+            domModal = $('#myModal');
+            domModal.modal({
+                keyboard: false,
+                backdrop: 'static'
+                });
+            domModal.modal('show')
+
+            $('#btnClose').live('click', function(){
+                domModal.modal('hide');
+            });
+    });
+</script>
 </head>
 
 <body>
-        <a href='https://api.singly.com/oauth/authorize?client_id=55a4cc03aeb47566804a3dc210af2548&redirect_uri=http://localhost:8000/singly/callback&service=instagram'> Instagram </a>
-        <a href='https://api.singly.com/oauth/authorize?client_id=55a4cc03aeb47566804a3dc210af2548&redirect_uri=http://localhost:8000/singly/callback&service=twitter'> Twitter </a>
-        <a href='https://api.singly.com/oauth/authorize?client_id=55a4cc03aeb47566804a3dc210af2548&redirect_uri=http://localhost:8000/singly/callback&service=facebook'> Facebook </a>
-        <a href='https://api.singly.com/oauth/authorize?client_id=55a4cc03aeb47566804a3dc210af2548&redirect_uri=http://localhost:8000/singly/callback&service=foursquare'> Foursquare </a>
-        <a href='https://api.singly.com/oauth/authorize?client_id=55a4cc03aeb47566804a3dc210af2548&redirect_uri=http://localhost:8000/singly/callback&service=linkedin'> LinkedIn </a>
+    <div class="modal hide fade" id="myModal">
+    <div class="modal-header">
+        <h2>Hello there. <br/>We'd love to show your rockin' data.</h2>
+    </div>
+    <div id="modal-interior" class="modal-body">
+        <h3>Let's pick your poisons:</h3>
+        <br />
+         <a class='btn btn-primary' href='https://api.singly.com/oauth/authorize?client_id=55a4cc03aeb47566804a3dc210af2548&redirect_uri=http://localhost:8000/singly/callback&service=linkedin'> LinkedIn </a>
+         <a class='btn btn-primary' href='https://api.singly.com/oauth/authorize?client_id=55a4cc03aeb47566804a3dc210af2548&redirect_uri=http://localhost:8000/singly/callback&service=instagram'> Instagram </a>
+         <a class='btn btn-primary' href='https://api.singly.com/oauth/authorize?client_id=55a4cc03aeb47566804a3dc210af2548&redirect_uri=http://localhost:8000/singly/callback&service=twitter'> Twitter </a>
+         <a class='btn btn-primary' href='https://api.singly.com/oauth/authorize?client_id=55a4cc03aeb47566804a3dc210af2548&redirect_uri=http://localhost:8000/singly/callback&service=facebook'> Facebook </a>
+         <a class='btn btn-primary' href='https://api.singly.com/oauth/authorize?client_id=55a4cc03aeb47566804a3dc210af2548&redirect_uri=http://localhost:8000/singly/callback&service=foursquare'> Foursquare </a>
+    </div>
+    <div class="modal-footer">
+    <a id="btnClose" href="/accounts/start/" class="btn btn-primary">It's cool, I'm ready for the data!</a>
+    </div>
+    </div>
 </body>
 </html>

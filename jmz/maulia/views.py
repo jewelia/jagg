@@ -3,11 +3,68 @@ from django.shortcuts import render_to_response
 
 import urllib
 import urllib2
-import urlparse
 import json
 
+code = ''
 
 def connect_to_service(request):
+    '''
+    SINGLY_ACCESS_TOKEN_URL = 'https://api.singly.com/oauth/access_token'
+    SINGLY_PROFILES = 'https://api.singly.com/v0/profiles'
+
+    # Get singly access code
+    code = request.GET.get("code")
+    print("OAuth code is %s" % (code, ))
+
+    post_params = {
+        'client_id' : settings.SINGLY_CLIENT_ID,
+        'client_secret' : settings.SINGLY_CLIENT_SECRET,
+        'code': code
+        }
+    post_data = urllib.urlencode(post_params)
+
+    print "Calling %s with params %s" % (SINGLY_ACCESS_TOKEN_URL, post_data)
+    request2 = urllib2.Request(SINGLY_ACCESS_TOKEN_URL, post_data)
+    response2 = urllib2.urlopen(request2)
+
+    access_token_data = response2.read()
+    print("Access token response data is %s" % (access_token_data, ))
+
+    access_token_json = json.loads(access_token_data)
+    access_token = access_token_json['access_token']
+    print("Access token is %s" % (access_token, ))
+
+    
+    api_request_profiles = SINGLY_PROFILES + '?access_token=' + access_token
+    
+    all_api_calls = {'profile': api_request_profiles}
+
+    facebook = False
+    twitter = False
+    linkedin = False
+    foursquare = False
+
+    for key in all_api_calls.keys():
+        call = all_api_calls[key]
+
+        a_request = urllib2.Request(call)
+        a_response = urllib2.urlopen(a_request)
+        a_data = a_response.read()
+
+        a_json = json.loads(a_data)
+
+        count = 0
+        while count < len(a_json):
+            try:
+                if a_json['twitter']:
+                    twitter = True
+            except KeyError:
+                twitter = False
+
+            count += 1
+
+    #1 Fetch Profile Data
+    '''
     return render_to_response('singly.html')
 
 def singly_authorize(request):
@@ -76,6 +133,7 @@ def singly_authorize(request):
 
         a_json = json.loads(a_data)
         json_array = []
+        images_array = []
         count = 0
         if key != 'profile':
 
@@ -107,17 +165,29 @@ def singly_authorize(request):
                     #    type = oembed_obj['type']
                     if a_json[count]['idr'].find('twitter') > 0:
                         type = 'twitter'
+                        lat = ''
+                        lng = ''
                     elif a_json[count]['idr'].find('facebook') > 0:
                         type = 'facebook'
+                        lat = a_json[count]['oembed']['lat']
+                        lng = a_json[count]['oembed']['lng']
                     elif a_json[count]['idr'].find('linkedin') > 0:
                         type = 'linkedin'
+                        lat = ''
+                        lng = ''
                     elif a_json[count]['idr'].find('foursquare') > 0:
                         type = 'foursquare'
+                        lat = ''
+                        lng = ''
                     elif a_json[count]['idr'].find('instagram') > 0:
                         type = 'instagram'
+                        lat = ''
+                        lng = ''
 
                 except KeyError:
                     type = ''
+                    lat = ''
+                    lng = ''
 
                 try:
                     if key == 'photo':
@@ -143,6 +213,7 @@ def singly_authorize(request):
                     if key == 'photo':
                         if oembed_obj['url']:
                             data = oembed_obj['url']
+                            images_array.append(data)
                     elif key == 'status': 
                         if oembed_obj['text']:
                             data = oembed_obj['text']
@@ -175,6 +246,8 @@ def singly_authorize(request):
                     'data' : data,
                     'height' : height,
                     'width' : width,
+                    'lat' : lat,
+                    'lng' : lng,
                 }
                 a_tuple = [date_obj, data]
                 json_array.append(a_tuple)
@@ -201,6 +274,7 @@ def singly_authorize(request):
                                'photo_json' : scrubbed_photo_data,
                                'profile_json' : scrubbed_profile_data,
                                'checkin_json' : scrubbed_checkin_data,
-                               'status_json' : scrubbed_status_data}
+                               'status_json' : scrubbed_status_data,
+                               'images_array' : images_array}
                               )
 
