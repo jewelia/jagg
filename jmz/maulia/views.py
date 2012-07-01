@@ -56,7 +56,6 @@ def connect_to_service(request):
         a_data = a_response.read()
 
         a_json = json.loads(a_data)
-        print a_json
 
         try:
             if a_json['twitter']:
@@ -297,7 +296,8 @@ def singly_authorize(request):
                 scrubbed_status_data = json.JSONEncoder().encode(json_array)
                 num_status = str(len(json_array))
 
-    return render_to_response('data.html',
+    #return render_to_response('data.html',
+    return render_to_response('charts.html',
                               {'num_photos' : num_photos,
                                'num_status' : num_status,
                                'num_checkins' : num_checkins,

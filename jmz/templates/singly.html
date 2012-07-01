@@ -6,8 +6,6 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
     <title>Why, Hello There.</title>
     <link rel="stylesheet" href="/static/css/bootstrap.css">
-    <script type="text/javascript"  href="/static/js/bootstrap.min.js"></script>
-    <script type="text/javascript"  href="/static/js/bootstrap-modal.js"></script>
     <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
     <script type="text/javascript" src="http://current.bootstrapcdn.com/bootstrap-v204/js/bootstrap.js"></script>
     <script type="text/javascript">
@@ -29,10 +27,10 @@
 <body>
     <div class="modal hide fade" id="myModal">
     <div class="modal-header">
-        <h2>Hello there. <br/>We'd love to show your rockin' data.</h2>
+        <h2>Hello there, welcome to Momento.</h2>
     </div>
     <div id="modal-interior" class="modal-body">
-        <h3>Let's pick your poisons:</h3>
+        <h3>Let's connect to some services to show you your social momentos:</h3>
         <br />
         {% if linkedin %}
          <a class='btn btn-primary' href='https://api.singly.com/oauth/authorize?client_id=55a4cc03aeb47566804a3dc210af2548&redirect_uri=http://localhost:8000/singly/callback&service=linkedin' disabled='disabled'> LinkedIn </a>
@@ -61,7 +59,11 @@
          {% endif %}
     </div>
     <div class="modal-footer">
-    <a id="btnClose" href="/data/" class="btn btn-primary">It's cool, I'm ready for the data!</a>
+    {% if foursquare or linkedin or instagram or twitter or facebook %}
+        <a id="btnClose" href="/data/" class="btn btn-primary">It's cool, I'm ready for the data!</a>
+    {% else %}
+        <a id="btnClose" href="/data/" class="btn btn-primary" disabled='disabled'>It's cool, I'm ready for the data!</a>
+    {% endif %}
     </div>
     </div>
 </body>
