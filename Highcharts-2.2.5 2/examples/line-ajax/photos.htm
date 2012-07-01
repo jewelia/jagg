@@ -1,37 +1,42 @@
-	<head>
-		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-		<title>Highcharts Example</title>
+<!doctype html>
 
-		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-		<script type="text/javascript">
-$(function () {
-    var chart;
-    var bucket_size = 25920000; // a month.
-    $(document).ready(function() {
-        url = '"http://static.adzerk.net/Advertisers/bd294ce7ff4c43b6aad4aa4169fb819b.jpg" ';
-        var images = [];
-        var links = [];
-        // define the options
-        var options = {
-            chart: {
-                renderTo: 'container'
-            },
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="/static/css/bootstrap.css">
+    <script type="text/javascript" src="http://current.bootstrapcdn.com/bootstrap-v204/js/bootstrap.js"></script>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <title>Momento</title>
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script type="text/javascript">
+    $(function () {
+        var chart;
+        var bucket_size = 25920000; // a month.
+        $(document).ready(function() {
+            url = '"http://static.adzerk.net/Advertisers/bd294ce7ff4c43b6aad4aa4169fb819b.jpg" ';
+            var images = [];
+            var links = [];
+            // define the options
+            var options = {
+                chart: {
+                    renderTo: 'container'
+                },
     
-            title: {
-                text: 'SOCIAL NETWORK PERSONAL ANALYTICS'
-            },
+              title: {
+                    text: 'MOMENTO'
+                },
     
-            xAxis: {
-                type: 'datetime',
-                tickInterval: 7 * 24 * 3600 * 4000, // one month 
-                tickWidth: 0,
-                gridLineWidth: 1,
-                labels: {
-                    align: 'left',
-                    x: 3,
-                    y: -3
-                }
-            },
+                xAxis: {
+                    type: 'datetime',
+                    tickInterval: 7 * 24 * 3600 * 4000, // one month 
+                    tickWidth: 0,
+                    gridLineWidth: 1,
+                    labels: {
+                        align: 'left',
+                        x: 3,
+                        y: -3
+                    }
+                },
     
             yAxis: [{ // left y axis
                 title: {
@@ -133,7 +138,8 @@ $(function () {
         photos =[],
         checkIns = [];
 
-       jQuery.getJSON('../../../julia_photo_json.json', null, function(text) {
+       //jQuery.getJSON('../../../julia_photo_json.json', null, function(text) {
+        jQuery.getJSON('{{ photo_json|safe }}', null, function(text) {
             i = 0;
             time = text[0][0]
             counter = 0; 

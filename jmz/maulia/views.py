@@ -56,7 +56,6 @@ def connect_to_service(request):
         a_data = a_response.read()
 
         a_json = json.loads(a_data)
-        print a_json
 
         try:
             if a_json['twitter']:
@@ -84,8 +83,6 @@ def connect_to_service(request):
         except KeyError:
             instagram = False
             
-        print "Instagram " + str(instagram)
-
     return render_to_response('singly.html',
                               { 'instagram': instagram,
                                'facebook' : facebook,
@@ -167,23 +164,25 @@ def singly_authorize(request):
         count = 0
         if key != 'profile':
 
+            #if key == 'photo':
+            #    print "PHOTOS: " + str(a_json)
             #if key == 'checkin':
-            #    print a_json
+                #print "CHECKINS: " + str(a_json)
+            #if key == 'status':
+            #    print "STATUS: " + str(a_json)
 
             while count < len(a_json):
                 oembed_obj = a_json[count]['oembed']
                 date_obj = a_json[count]['at']
                 if str(date_obj).startswith('12', 0):
-                    print "adjusting " + str(date_obj)
                     date_obj += 13744850000
                     #date_list = list(str(date_obj))
                     #date_list[0:1] = '13'
                     #date_obj = ''.join(date_list)
-                if key == 'photo':
-                    print date_obj
-                if date_obj > '1341295445':
-                    continue
+                #if key == 'photo':
+                #    print date_obj
 
+                
                 try:
                     if oembed_obj['provider_name']:
                         source = oembed_obj['provider_name']
@@ -221,7 +220,13 @@ def singly_authorize(request):
 
                 try:
                     if key == 'photo':
-                        if oembed_obj['provider_url']:
+                        if type == 'twitter':
+                            link = 'http://www.twitter.com/' + a_json[count]['data']['user']['screen_name'] + '/status/' + a_json[count]['data']['id_str']
+
+                        #if a_json[count]['data']['entities']['media'][0]['media_url']:
+                        #    link =  a_json[count]['data']['entities']['media'][0]['media_url']
+                        #    print "LINK " + link
+                        elif oembed_obj['provider_url']:
                             link = oembed_obj['provider_url']
                     elif key == 'status':
                         if type == 'facebook':
@@ -246,7 +251,14 @@ def singly_authorize(request):
                             images_array.append(data)
                     elif key == 'status': 
                         if oembed_obj['text']:
-                            data = oembed_obj['text']
+                            d = oembed_obj['text']
+                            if (not 'run' in d) and (not 'Neela' in d):
+                                data_list = list(d)
+                                data_list = data_list[0:20]
+                                data = ''.join(data_list)
+                            else:
+                                data = ''
+
                     elif key == 'checkin' or key == 'foursquare':
                         if oembed_obj['title']:
                             data = oembed_obj['title']
@@ -297,7 +309,8 @@ def singly_authorize(request):
                 scrubbed_status_data = json.JSONEncoder().encode(json_array)
                 num_status = str(len(json_array))
 
-    return render_to_response('data.html',
+    #return render_to_response('data.html',
+    return render_to_response('charts.html',
                               {'num_photos' : num_photos,
                                'num_status' : num_status,
                                'num_checkins' : num_checkins,
