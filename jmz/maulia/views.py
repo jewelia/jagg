@@ -57,8 +57,108 @@ def singly_authorize(request):
     api_request_checkins = SINGLY_CHECKINS + '?access_token=' + access_token
     api_request_status = SINGLY_STATUS + '?access_token=' + access_token
 
+    all_api_calls = {'profile': api_request_profiles, 
+                     'photo' : api_request_photos, 
+                     'checkin': api_request_checkins, 
+                     'status' : api_request_status}
 
-    ''' PHOTOS '''
+    scrubbed_photo_data = []
+    scrubbed_profile_data= []
+    scrubbed_checkin_data = []
+    scrubbed_status_data = []
+
+    for key in all_api_calls.keys():
+        call = all_api_calls[key]
+
+        a_request = urllib2.Request(call)
+        a_response = urllib2.urlopen(a_request)
+        a_data = a_response.read()
+
+        a_json = json.loads(a_data)
+        json_array = []
+        count = 0
+        if key != 'profile':
+            while count < len(a_json):
+                oembed_obj = a_json[count]['oembed']
+                date_obj = a_json[count]['at']
+
+                provider_name = ''
+                type = ''
+                provider_url = ''
+                image_location = ''
+                height = ''
+                width = ''
+                link = ''
+                source = ''
+
+                try:
+                    if oembed_obj['provider_name']:
+                        source = oembed_obj['provider_name']
+                except KeyError:
+                    source = ''
+
+                try:
+                    if oembed_obj['type']:
+                        type = oembed_obj['type']
+                except KeyError:
+                    type = ''
+
+                try: 
+                    if oembed_obj['provider_url']:
+                        link = oembed_obj['provider_url']
+                except KeyError:
+                    link = ''
+                
+                try:
+                    if oembed_obj['url']:
+                        image_location = oembed_obj['url']
+                except KeyError:
+                    image_location = ''
+
+                try:
+                    if oembed_obj['height']:
+                        height = oembed_obj['height']
+                except KeyError:
+                    height = ''
+
+                try:
+                    if oembed_obj['width']:
+                        width = oembed_obj['width']
+                except KeyError:
+                    width = ''
+                
+                data = {
+                    #'date' : date_obj,
+                    'source' : source,
+                    'type' : type,
+                    'link' : link,
+                    'image_location' : image_location,
+                    'height' : height,
+                    'width' : width,
+                }
+                a_tuple = [date_obj, data]
+                json_array.append(a_tuple)
+                count += 1
+            json_array.sort()
+
+            if key == 'photo':
+                scrubbed_photo_data = json.JSONEncoder().encode(json_array)
+            if key == 'profile':
+                scrubbed_profile_data = json.JSONEncoder().encode(json_array)
+            if key == 'checkin':
+                scrubbed_checkin_data = json.JSONEncoder().encode(json_array)
+            if key == 'status':
+                scrubbed_status_data = json.JSONEncoder().encode(json_array)
+    
+    return render_to_response('data.html',
+                              {'photo_json' : scrubbed_photo_data,
+                               'profile_json' : scrubbed_profile_data,
+                               'checkin_json' : scrubbed_checkin_data,
+                               'status_json' : scrubbed_status_data}
+                              )
+    
+
+'''
     #2 Make HTTP Requests for checkin data
     request_photos = urllib2.Request(api_request_photos)
     response_photos = urllib2.urlopen(request_photos)
@@ -68,32 +168,6 @@ def singly_authorize(request):
     
     #4 Load checkins into json parser
     photo_json = json.loads(photos)
-
-    '''
-    [
-    {
-        "date": "date",
-        "source": "source",
-        "link": "link",
-        "type": "type",
-        "numb_likes": "numb_likes",
-        "image_location": "image_location",
-        "width": "width",
-        "height": "height"
-[
-"oembed": {
-  "type": "photo",
-  "height": 720,
-  "width": 720,
-  "url": "https://fbcdn-photos-a.akamaihd.net/hphotos-ak-ash4/427860_3111729283648_1576860066_32083208_684623008_s.jpg",
-  "provider_name": "facebook",
-  "provider_url": "http://www.facebook.com/photo.php?fbid=3111729283648&set=a.3111729203646.2113918.1576860066&type=1",
-  "author_name": "Beau Gunderson"
-}
-]
-    
-    '''
-
 
     print photo_json[0]['oembed']
     print photo_json[0]['at']
@@ -122,14 +196,10 @@ def singly_authorize(request):
     #print "BEGIN JSON"
     #print scrubbed_data
 
-    ''''
-
     #3 Write profile data to file
-    sfile = open(settings.FILE_WRITE_PATH + 'julia-photos.json-v2', 'w')
-    sfile.write(photos)
-    #sfile.write(str(photo_json))
-    #sfile.write(json.dumps(photos)
-    sfile.close()
+    #sfile = open(settings.FILE_WRITE_PATH + 'julia-photos.json-v2', 'w')
+    #sfile.write(photos)
+    #sfile.close()
 
     #2 Make HTTP Re`14yyquests for checkin data
     request_checkins = urllib2.Request(api_request_checkins)
@@ -179,7 +249,4 @@ def singly_authorize(request):
     '''
 
     #return HttpResponse('<h1>Page was found</h1>')
-    return render_to_response('generic/etsy/etsy_start.html',
-                              {'photo_json' : scrubbed_photo_data,})
-
 
