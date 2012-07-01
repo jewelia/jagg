@@ -158,6 +158,7 @@ textarea {
 body {
   margin: 0;
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  /*font-family: "Syncopate", Helvetica, Arial, sans-serif;*/
   font-size: 13px;
   line-height: 18px;
   color: #333333;
@@ -445,6 +446,20 @@ h6 {
   margin: 0;
   font-family: inherit;
   font-weight: bold;
+  color: inherit;
+  text-rendering: optimizelegibility;
+}
+
+.momento {
+  margin: 0;
+  font-family: "Syncopate";
+  font-weight: bold;
+  color: #00685a;
+  text-rendering: optimizelegibility;
+}
+h2.special {
+  margin: 0;
+  font-family: "Syncopate";
   color: inherit;
   text-rendering: optimizelegibility;
 }

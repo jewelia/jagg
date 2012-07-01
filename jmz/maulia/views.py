@@ -83,8 +83,6 @@ def connect_to_service(request):
         except KeyError:
             instagram = False
             
-        print "Instagram " + str(instagram)
-
     return render_to_response('singly.html',
                               { 'instagram': instagram,
                                'facebook' : facebook,
@@ -167,9 +165,11 @@ def singly_authorize(request):
         if key != 'profile':
 
             #if key == 'photo':
-            #    print a_json
+            #    print "PHOTOS: " + str(a_json)
             #if key == 'checkin':
-            #    print a_json
+                #print "CHECKINS: " + str(a_json)
+            #if key == 'status':
+            #    print "STATUS: " + str(a_json)
 
             while count < len(a_json):
                 oembed_obj = a_json[count]['oembed']
@@ -251,7 +251,14 @@ def singly_authorize(request):
                             images_array.append(data)
                     elif key == 'status': 
                         if oembed_obj['text']:
-                            data = oembed_obj['text']
+                            d = oembed_obj['text']
+                            if (not 'run' in d) and (not 'Neela' in d):
+                                data_list = list(d)
+                                data_list = data_list[0:20]
+                                data = ''.join(data_list)
+                            else:
+                                data = ''
+
                     elif key == 'checkin' or key == 'foursquare':
                         if oembed_obj['title']:
                             data = oembed_obj['title']
