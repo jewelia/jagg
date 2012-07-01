@@ -86,10 +86,15 @@ def singly_authorize(request):
                 oembed_obj = a_json[count]['oembed']
                 date_obj = a_json[count]['at']
                 if str(date_obj).startswith('12', 0):
-                    date_obj += 1286370912101
+                    print "adjusting " + str(date_obj)
+                    date_obj += 13744850000
                     #date_list = list(str(date_obj))
                     #date_list[0:1] = '13'
                     #date_obj = ''.join(date_list)
+                if key == 'photo':
+                    print date_obj
+                if date_obj > '1341295445':
+                    continue
 
                 try:
                     if oembed_obj['provider_name']:
