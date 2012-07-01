@@ -9,25 +9,19 @@
 $(function () {
     var chart;
     $(document).ready(function() {
-    
         // define the options
         var options = {
-    
             chart: {
                 renderTo: 'container'
             },
     
             title: {
-                text: 'Daily visits at www.highcharts.com'
-            },
-    
-            subtitle: {
-                text: 'Source: Google Analytics'
+                text: 'SOCIAL NETWORK PERSONAL ANALYTICS'
             },
     
             xAxis: {
                 type: 'datetime',
-                tickInterval: 7 * 24 * 3600 * 1000, // one week
+                tickInterval: 7 * 24 * 3600 * 4000, // one month? 
                 tickWidth: 0,
                 gridLineWidth: 1,
                 labels: {
@@ -94,9 +88,11 @@ $(function () {
                                     },
                                     headingText: this.series.name,
                                     maincontentText: Highcharts.dateFormat('%A, %b %e, %Y', this.x) +':<br/> '+
-                                        this.y +' visits',
+                                        this.y +' visits ',
                                     width: 200
                                 });
+                              console.log(this.x);
+                              console.log(this.y);
                             }
                         }
                     },
@@ -107,69 +103,57 @@ $(function () {
             },
     
             series: [{
-                name: 'All visits',
+                name: 'Photos',
                 lineWidth: 4,
                 marker: {
                     radius: 4
                 }
             }, {
-                name: 'New visitors'
+                name: 'Check-ins'
             }]
         };
     
     
         // Load data asynchronously using jQuery. On success, add the data
-        // to the options and initiate the chart.
+        // to the options and timeiate the chart.
         // This data is obtained by exporting a GA custom report to TSV.
         // http://api.jquery.com/jQuery.get/
-        jQuery.get('analytics.tsv', null, function(tsv, state, xhr) {
-            var lines = [],
-                listen = false,
-                date,
-    
-                // set up the two data series
-                allVisits = [],
-                newVisitors = [];
-    
-            // inconsistency
-            if (typeof tsv !== 'string') {
-                tsv = xhr.responseText;
+        photos =[],
+        checkIns = [];
+
+       jQuery.getJSON('julia_photo_json.json', null, function(text) {
+            console.log(text); 
+            i = 0;
+            time = text[0][0]
+            counter = 0; 
+            while(i<text.length) {
+                if (text[i][0] < (time + 259200)) {
+                   counter++; 
+                }
+                else {
+                    photos.push([time, counter]);
+                    console.log(time + ", " + counter);
+                    counter = 0;
+                }
+                time = text[i][0];
+                i++;
             }
-    
-            // split the data return into lines and parse them
-            tsv = tsv.split(/\n/g);
-            jQuery.each(tsv, function(i, line) {
-    
-                // listen for data lines between the Graph and Table headers
-                if (tsv[i - 3] == '# Graph') {
-                    listen = true;
-                } else if (line == '' || line.charAt(0) == '#') {
-                    listen = false;
-                }
-    
-                // all data lines start with a double quote
-                if (listen) {
-                    line = line.split(/\t/);
-                    date = Date.parse(line[0] +' UTC');
-    
-                    allVisits.push([
-                        date,
-                        parseInt(line[1].replace(',', ''), 10)
-                    ]);
-                    newVisitors.push([
-                        date,
-                        parseInt(line[2].replace(',', ''), 10)
-                    ]);
-                }
-            });
-    
-            options.series[0].data = allVisits;
-            options.series[1].data = newVisitors;
-    
-            chart = new Highcharts.Chart(options);
-        });
+                // photos.push([text[i][0], text[i][1].width]);
+                // checkIns.push([text[i][0], text[i][1].height]);
+                // links.push([text[i][0], text[i][1].link]);
+                // console.log(text[i][1].link);
+                console.log(photos.length);
+                // console.log(checkIns.length);
+                options.series[0].data = photos;
+                // options.series[1].data = checkIns; 
+                chart = new Highcharts.Chart(options);
+        }); 
+
+    // var date, source, link, type, numb_likes, data, width, height;
+ 
+
+    // push stuff to photos and checkIns based on json.
     });
-    
 });
 		</script>
 	</head>
