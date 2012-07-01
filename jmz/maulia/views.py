@@ -5,7 +5,6 @@ import urllib
 import urllib2
 import json
 
-singly_code = ''
 
 def index(request):
     return render_to_response('singly.html',
@@ -45,6 +44,8 @@ def connect_to_service(request):
     
     api_request_profiles = SINGLY_PROFILES + '?access_token=' + access_token
     
+    request.session['REQ_TOKEN_SESSION_KEY'] = access_token
+    
     all_api_calls = {'profile': api_request_profiles}
 
     for key in all_api_calls.keys():
@@ -55,35 +56,35 @@ def connect_to_service(request):
         a_data = a_response.read()
 
         a_json = json.loads(a_data)
+        print a_json
 
-        count = 0
-        while count < len(a_json):
-            try:
-                if a_json['twitter']:
-                    twitter = True
-            except KeyError:
-                twitter = False
-            try:
-                if a_json['facebook']:
-                    facebook = True
-            except KeyError:
+        try:
+            if a_json['twitter']:
+                twitter = True
+        except KeyError:
+            twitter = False
+        try:
+            if a_json['facebook']:
+                facebook = True
+        except KeyError:
                 facebook = False
-            count += 1
-            try:
-                if a_json['linkedin']:
-                    linkedin = True
-            except KeyError:
-                linkedin = False
-            try:
-                if a_json['foursquare']:
-                    foursquare = True
-            except KeyError:
-                foursquare = False
-            try:
-                if a_json['instagram']:
-                    instagram = True
-            except KeyError:
-                instagram = False
+        try:
+            if a_json['linkedin']:
+                linkedin = True
+        except KeyError:
+            linkedin = False
+        try:
+            if a_json['foursquare']:
+                foursquare = True
+        except KeyError:
+            foursquare = False
+        try:
+            if a_json['instagram']:
+                instagram = True
+        except KeyError:
+            instagram = False
+            
+        print "Instagram " + str(instagram)
 
     return render_to_response('singly.html',
                               { 'instagram': instagram,
@@ -94,13 +95,15 @@ def connect_to_service(request):
                                })
 
 def singly_authorize(request):
-    SINGLY_ACCESS_TOKEN_URL = 'https://api.singly.com/oauth/access_token'
+    access_token = request.session['REQ_TOKEN_SESSION_KEY']
+    
     SINGLY_PROFILES = 'https://api.singly.com/v0/profiles'
 
     SINGLY_PHOTOS= 'https://api.singly.com/v0/types/photos'
     SINGLY_CHECKINS = 'https://api.singly.com/v0/types/checkins'
     SINGLY_STATUS = 'https://api.singly.com/v0/types/statuses'
-
+    '''
+    SINGLY_ACCESS_TOKEN_URL = 'https://api.singly.com/oauth/access_token'
     FOURSQUARE = 'https://api.singly.com/v0/services/foursquare/checkins'
 
     # Get singly access code
@@ -131,6 +134,7 @@ def singly_authorize(request):
         }
 
     get_data = urllib.urlencode(get_params)
+    '''
 
     #1 Fetch Profile Data
     api_request_profiles = SINGLY_PROFILES + '?access_token=' + access_token
