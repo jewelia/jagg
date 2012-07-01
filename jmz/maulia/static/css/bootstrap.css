@@ -469,6 +469,18 @@ h3.special {
   color: #7d0057;
   text-rendering: optimizelegibility;
 }
+.photo {
+  margin: 0;
+  font-family: "Syncopate";
+  color: #4a036f;
+  text-rendering: optimizelegibility;
+}
+.checkins {
+  margin: 0;
+  font-family: "Syncopate";
+  color: #990021;
+  text-rendering: optimizelegibility;
+}
 
 h1 small,
 h2 small,

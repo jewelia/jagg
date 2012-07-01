@@ -26,8 +26,12 @@
             // define the options
             var options = {
                 chart: {
-                    renderTo: 'container'
-                },
+                    renderTo: 'container',
+                    type: 'spline'
+                    },
+                colors: [
+                    '#4a036f', 
+                ],
     
               title: {
                     text: ''
@@ -178,8 +182,10 @@
         // define the options
         var options = {
             chart: {
-                renderTo: 'container-checkin'
-            },
+                renderTo: 'container-checkin',
+                type: 'spline'
+                },
+                colors: [ '#990021' ],
     
             title: {
                 text: ''
@@ -245,7 +251,7 @@
                     '<td style="text-align: right"><b>{point.y} EUR</b></td></tr>',
                     footerFormat: '</table>',
                     formatter: function() {
-                     return '<iframe width="220" height="250" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="https://maps.google.com/maps?q=' + lats[this.x] + ',+' + longs[this.x] + '&amp;ie=UTF8&amp;t=m&amp;z=14&amp;ll=' + lats[this.x] + ',' + longs[this.x] + '&amp;output=embed"></iframe><br /><small><a href="https://maps.google.com/maps?q=' + lats[this.x] + ',+' + longs[this.x] + '&amp;ie=UTF8&amp;t=m&amp;z=14&amp;ll=' + lats[this.x] + ',' + longs[this.x] + '&amp;source=embed" style="color:#0000FF;text-align:left">View Larger Map</a></small>';
+                     return '<iframe width="220" height="250" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="https://maps.google.com/maps?q=' + lats[this.x] + ',+' + longs[this.x] + '&amp;ie=UTF8&amp;t=m&amp;z=14&amp;ll=' + lats[this.x] + ',' + longs[this.x] + '&amp;output=embed"></iframe><br /><small><a href="https://maps.google.com/maps?q=' + lats[this.x] + ',+' + longs[this.x] + '&amp;ie=UTF8&amp;t=m&amp;z=14&amp;ll=' + lats[this.x] + ',' + longs[this.x] + '&amp;source=embed" style="color:#0000FF;text-align:left;opacity=0.6;">View Larger Map</a></small>';
                     },
                     valueDecimals: 2
                 },    
@@ -316,136 +322,7 @@
             
         });
     });
-    $(function () {
-    var chart;
-    var bucket_size = 25920000; // a month.
-    $(document).ready(function() {
-        var data= [];
-        var links = [];
-        var options = {
-            chart: {
-                renderTo: 'container-status'
-            },
     
-            title: {
-                text: ''
-            },
-    
-            xAxis: {
-                type: 'datetime',
-                tickInterval: 7 * 24 * 3600 * 4000, // one month 
-                tickWidth: 0,
-                gridLineWidth: 1,
-                labels: {
-                    align: 'left',
-                    x: 3,
-                    y: -3
-                }
-            },
-    
-            yAxis: [{ // left y axis
-                title: {
-                    text: null
-                },
-                labels: {
-                    align: 'left',
-                    x: 3,
-                    y: 16,
-                    formatter: function() {
-                        return Highcharts.numberFormat(this.value, 0);
-                    }
-                },
-                showFirstLabel: false
-            }, { // right y axis
-                linkedTo: 0,
-                gridLineWidth: 0,
-                opposite: true,
-                title: {
-                    text: null
-                },
-                labels: {
-                    align: 'right',
-                    x: -3,
-                    y: 16,
-                    formatter: function() {
-                        return Highcharts.numberFormat(this.value, 0);
-                    }
-                },
-                showFirstLabel: false
-            }],
-    
-            legend: {
-                align: 'left',
-                verticalAlign: 'top',
-                y: 20,
-                floating: true,
-                borderWidth: 0
-            },
-            plotOptions: {
-                series: {
-                    cursor: 'pointer',
-                    point: {
-                        events: {
-                            click: function() {
-                                hs.htmlExpand(null, {
-                                    pageOrigin: {
-                                        x: this.pageX,
-                                        y: this.pageY
-                                    },
-                                    headingText: this.series.name,
-                                    maincontentText: Highcharts.dateFormat('%A, %b %e, %Y', this.x) +':<br/> '+
-                                        this.y + ' status_texts. ' +  '<a href="' + links[this.x] + '">original link</a>',
-                                    width: 200
-                                });
-                            }
-                        }
-                    },
-                    marker: {
-                        lineWidth: 1
-                    }
-                }
-            },
-    
-            series: [{
-                name: 'Photos',
-                lineWidth: 4,
-                marker: {
-                    radius: 4
-                }
-            }, {
-                name: 'Check-ins'
-            }]
-        };
-    
-        // Load data asynchronously using jQuery. On success, add the data
-        // to the options and timeiate the chart.
-        // This data is obtained by exporting a GA custom report to TSV.
-        // http://api.jquery.com/jQuery.get/
-       status_texts = [];
-
-       text = jQuery.parseJSON('{{ status_json|safe }}')
-            i = 0;
-            time = text[0][0]
-            counter = 0; 
-            while(i<text.length) {
-                if (text[i][0] < (time + bucket_size)) {
-                   counter++; 
-                } else {
-                    status_texts.push([time, counter]);
-                    counter = 1;
-                }
-                key = text[i][0];
-                data[key] = text[i][1].data;
-                links[key] = text[i][1].link;
-                console.log(text[i][1].link);
-                time = key;
-                i++;
-            }
-                options.series[0].data = status_texts;
-                chart = new Highcharts.Chart(options);
-        });
-    });
-
     </script>
     </head>
     <body>
@@ -453,9 +330,11 @@
             <br/>
         a new way to experience the past.</h2>
     <h3>brought to you by <a href='http://www.twitter.com/zmagg/'>@zmagg</a> and <a href='http://www.twitter.com/jewelia'>@jewelia</a></h3>
-        <h2> hover to see your photos. click to see context. clap to say "yea!"</h2>
+    <hr>
+    <h2> hover to see your <span class='photo'>photos</span>. click to see context. clap to say "yea!"</h2>
         <div id="container" style="min-width: 300px; height: 400px; margin: 0 auto"></div>
-        <h2> hover to see your checkins. click to see context. give a high-five!</h2>
+        <hr>
+        <h2> hover to see your <span class='checkins'>checkins</span>. click to see context. give a high-five!</h2>
         <div id="container-checkin" style="min-width: 300px; height: 400px; margin: 0 auto"></div>
         <div id="container-status" style="min-width: 300px; height: 400px; margin: 0 auto"></div>
 
