@@ -251,6 +251,8 @@ def singly_authorize(request):
                             images_array.append(data)
                     elif key == 'status': 
                         if oembed_obj['text']:
+                            data = 'status'
+                            '''
                             d = oembed_obj['text']
                             if (not 'run' in d) and (not 'Neela' in d):
                                 data_list = list(d)
@@ -258,6 +260,7 @@ def singly_authorize(request):
                                 data = ''.join(data_list)
                             else:
                                 data = ''
+                                '''
 
                     elif key == 'checkin' or key == 'foursquare':
                         if oembed_obj['title']:
@@ -309,6 +312,7 @@ def singly_authorize(request):
                 scrubbed_status_data = json.JSONEncoder().encode(json_array)
                 num_status = str(len(json_array))
 
+    
     #return render_to_response('data.html',
     return render_to_response('charts.html',
                               {'num_photos' : num_photos,

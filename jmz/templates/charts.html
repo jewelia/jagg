@@ -95,7 +95,7 @@
                     formatter: function() {
                         image = '"' + images[this.x] + '" ';
                         link = '"' + links[this.x] + '"'; 
-                        str = '<a href=' + link + '><img src=' + image + 'title="" alt="" border="0" height="250" width="220"></a>';
+                        str = '<a href=' + link + '><img src=' + image + 'title="" alt="" border="0" height="250" width="220" style="opacity:0.6;"></a>';
                         return str;
                     },
                     valueDecimals: 2
@@ -316,15 +316,12 @@
             
         });
     });
-
     $(function () {
     var chart;
     var bucket_size = 25920000; // a month.
     $(document).ready(function() {
-        var lats= [];
-        var longs = [];
+        var data= [];
         var links = [];
-        // define the options
         var options = {
             chart: {
                 renderTo: 'container-status'
@@ -384,21 +381,6 @@
                 floating: true,
                 borderWidth: 0
             },
-    
-             tooltip: {
-                    shared: true,
-                    crosshairs: true,
-                    useHTML: true,
-                    headerFormat: '<small>{point.key}</small><table>',
-                    pointFormat: '<tr><td style="color: {series.color}">{series.name}: </td>' +
-                    '<td style="text-align: right"><b>{point.y} EUR</b></td></tr>',
-                    footerFormat: '</table>',
-                    formatter: function() {
-                     return  
-                    },
-                    valueDecimals: 2
-                },    
-
             plotOptions: {
                 series: {
                     cursor: 'pointer',
@@ -412,7 +394,7 @@
                                     },
                                     headingText: this.series.name,
                                     maincontentText: Highcharts.dateFormat('%A, %b %e, %Y', this.x) +':<br/> '+
-                                        this.y + ' status. ' +  '<a href="' + links[this.x] + '">original link</a>',
+                                        this.y + ' status_texts. ' +  '<a href="' + links[this.x] + '">original link</a>',
                                     width: 200
                                 });
                             }
@@ -425,23 +407,23 @@
             },
     
             series: [{
-                name: 'Checkins',
+                name: 'Photos',
                 lineWidth: 4,
                 marker: {
                     radius: 4
                 }
-            }
-            ]
+            }, {
+                name: 'Check-ins'
+            }]
         };
-
+    
         // Load data asynchronously using jQuery. On success, add the data
         // to the options and timeiate the chart.
         // This data is obtained by exporting a GA custom report to TSV.
         // http://api.jquery.com/jQuery.get/
-        statuses = [];
+       status_texts = [];
 
-        text = jQuery.parseJSON('{{ status_json|safe }}');
-
+       text = jQuery.parseJSON('{{ status_json|safe }}')
             i = 0;
             time = text[0][0]
             counter = 0; 
@@ -449,29 +431,33 @@
                 if (text[i][0] < (time + bucket_size)) {
                    counter++; 
                 } else {
-                    statuses.push([time, counter]);
+                    status_texts.push([time, counter]);
                     counter = 1;
                 }
                 key = text[i][0];
+                data[key] = text[i][1].data;
                 links[key] = text[i][1].link;
+                console.log(text[i][1].link);
                 time = key;
                 i++;
             }
-                options.series[0].data = statuses;
+                options.series[0].data = status_texts;
                 chart = new Highcharts.Chart(options);
-            
         });
     });
 
-        
     </script>
     </head>
     <body>
-        <h2 class='special'> welcome to <span class='momento'>momento</span>. a new way to experience the past.</h2>
-        <div id="container" style="min-width: 400px; height: 400px; margin: 0 auto"></div>
-        <div id="container-checkin" style="min-width: 400px; height: 400px; margin: 0 auto"></div>
-        <div id="container-status" style="min-width: 400px; height: 400px; margin: 0 auto"></div>
+        <h2 class='special'> welcome to <span class='momento'>momento</span>. 
+            <br/>
+        a new way to experience the past.</h2>
+    <h3>brought to you by <a href='http://www.twitter.com/zmagg/'>@zmagg</a> and <a href='http://www.twitter.com/jewelia'>@jewelia</a></h3>
+        <h2> hover to see your photos. click to see context. clap to say "yea!"</h2>
+        <div id="container" style="min-width: 300px; height: 400px; margin: 0 auto"></div>
+        <h2> hover to see your checkins. click to see context. give a high-five!</h2>
+        <div id="container-checkin" style="min-width: 300px; height: 400px; margin: 0 auto"></div>
+        <div id="container-status" style="min-width: 300px; height: 400px; margin: 0 auto"></div>
 
-        {{status_json}}
         </body>
 </html>
