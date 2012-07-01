@@ -79,8 +79,8 @@ def singly_authorize(request):
         count = 0
         if key != 'profile':
 
-            #if key == 'status':
-                #print a_json
+            if key == 'checkin':
+                print a_json
 
             while count < len(a_json):
                 oembed_obj = a_json[count]['oembed']
@@ -110,13 +110,21 @@ def singly_authorize(request):
                     type = ''
 
                 try:
-                    if oembed_obj['provider_url']:
-                        link = oembed_obj['provider_url']
-                    elif a_json[count]['data']['actions'][0]['name']:
-                        if a_json[count]['data']['actions'][0]['name'] == 'Comment':
-                            link = a_json[count]['data']['actions'][0]['link']
-                    elif a_json[count]['idr'].find('twitter') > 0:
-                        link = 'http://www.twitter.com/' + a_json[count]['data']['user']['screen_name'] + '/' + a_json[count]['data']['id_str']
+                    if key == 'photo':
+                        if oembed_obj['provider_url']:
+                            link = oembed_obj['provider_url']
+                    if key == 'status':
+                        if type == 'facebook':
+                            if a_json[count]['data']['actions'][0]['name']:
+                                if a_json[count]['data']['actions'][0]['name'] == 'Comment':
+                                    link = a_json[count]['data']['actions'][0]['link']
+                        elif a_json[count]['idr'].find('twitter') > 0:
+                            link = 'http://www.twitter.com/' + a_json[count]['data']['user']['screen_name'] + '/status/' + a_json[count]['data']['id_str']
+                    if key == 'checkin':
+                        if type == 'foursquare':
+                            link = 'https://foursquare.com/v/' + (a_json[count]['venue']['name']).replace(' ', '-') + "/" + a_json[count]['venue']['id']
+                        if type == 'facebook':
+                            link = 'https://www.facebook.com/' + a_json[count]['data']['from']['id'] + '/posts/' + a_json[count]['data']['id']
 
                 except KeyError:
                     link = ''
@@ -127,21 +135,25 @@ def singly_authorize(request):
                             data = oembed_obj['url']
                     elif key == 'status': 
                         if oembed_obj['text']:
-                            print "found text " + str(oembed_obj)
                             data = oembed_obj['text']
+                    elif key == 'checkin':
+                        if oembed_obj['title']:
+                            data = oembed_obj['title']
 
                 except KeyError:
                     data = ''
 
                 try:
-                    if oembed_obj['height']:
-                        height = oembed_obj['height']
+                    if key == 'photo':
+                        if oembed_obj['height']:
+                            height = oembed_obj['height']
                 except KeyError:
                     height = ''
 
                 try:
-                    if oembed_obj['width']:
-                        width = oembed_obj['width']
+                    if key == 'photo':
+                        if oembed_obj['width']:
+                            width = oembed_obj['width']
                 except KeyError:
                     width = ''
 
