@@ -5,6 +5,7 @@
     <link rel="stylesheet" href="/static/css/bootstrap.css">
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
     <script type="text/javascript" src="http://current.bootstrapcdn.com/bootstrap-v204/js/bootstrap.js"></script>
+    <script type="text/javascript" src="http://www.highcharts.com/highslide/highslide-full.min.js"></script>
     <script type="text/javascript" src="http://www.highcharts.com/highslide/highslide.config.js" charset="utf-8"></script>
     <script type="text/javascript" src="http://code.highcharts.com/highcharts.js" charset="utf-8"></script>
     <script type="text/javascript" src="http://code.highcharts.com/modules/exporting.js" charset="utf-8"></script>
@@ -28,7 +29,7 @@
                 },
     
               title: {
-                    text: 'MOMENTO'
+                    text: 'MOMENTO: Photos'
                 },
     
                 xAxis: {
@@ -130,9 +131,8 @@
                 marker: {
                     radius: 4
                 }
-            }, {
-                name: 'Check-ins'
-            }]
+            }
+            ]
         };
     
     
@@ -167,9 +167,159 @@
             
         });
     });
+    $(function () {
+    var chart;
+    var bucket_size = 25920000; // a month.
+    $(document).ready(function() {
+        var lats= [];
+        var longs = [];
+        var links = [];
+        // define the options
+        var options = {
+            chart: {
+                renderTo: 'container-checkin'
+            },
+    
+            title: {
+                text: ''
+            },
+    
+            xAxis: {
+                type: 'datetime',
+                tickInterval: 7 * 24 * 3600 * 4000, // one month 
+                tickWidth: 0,
+                gridLineWidth: 1,
+                labels: {
+                    align: 'left',
+                    x: 3,
+                    y: -3
+                }
+            },
+    
+            yAxis: [{ // left y axis
+                title: {
+                    text: null
+                },
+                labels: {
+                    align: 'left',
+                    x: 3,
+                    y: 16,
+                    formatter: function() {
+                        return Highcharts.numberFormat(this.value, 0);
+                    }
+                },
+                showFirstLabel: false
+            }, { // right y axis
+                linkedTo: 0,
+                gridLineWidth: 0,
+                opposite: true,
+                title: {
+                    text: null
+                },
+                labels: {
+                    align: 'right',
+                    x: -3,
+                    y: 16,
+                    formatter: function() {
+                        return Highcharts.numberFormat(this.value, 0);
+                    }
+                },
+                showFirstLabel: false
+            }],
+    
+            legend: {
+                align: 'left',
+                verticalAlign: 'top',
+                y: 20,
+                floating: true,
+                borderWidth: 0
+            },
+    
+             tooltip: {
+                    shared: true,
+                    crosshairs: true,
+                    useHTML: true,
+                    headerFormat: '<small>{point.key}</small><table>',
+                    pointFormat: '<tr><td style="color: {series.color}">{series.name}: </td>' +
+                    '<td style="text-align: right"><b>{point.y} EUR</b></td></tr>',
+                    footerFormat: '</table>',
+                    formatter: function() {
+                     return '<iframe width="220" height="250" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="https://maps.google.com/maps?q=' + lats[this.x] + ',+' + longs[this.x] + '&amp;ie=UTF8&amp;t=m&amp;z=14&amp;ll=' + lats[this.x] + ',' + longs[this.x] + '&amp;output=embed"></iframe><br /><small><a href="https://maps.google.com/maps?q=' + lats[this.x] + ',+' + longs[this.x] + '&amp;ie=UTF8&amp;t=m&amp;z=14&amp;ll=' + lats[this.x] + ',' + longs[this.x] + '&amp;source=embed" style="color:#0000FF;text-align:left">View Larger Map</a></small>';
+                    },
+                    valueDecimals: 2
+                },    
+
+            plotOptions: {
+                series: {
+                    cursor: 'pointer',
+                    point: {
+                        events: {
+                            click: function() {
+                                hs.htmlExpand(null, {
+                                    pageOrigin: {
+                                        x: this.pageX,
+                                        y: this.pageY
+                                    },
+                                    headingText: this.series.name,
+                                    maincontentText: Highcharts.dateFormat('%A, %b %e, %Y', this.x) +':<br/> '+
+                                        this.y + ' check-in. ' +  '<a href="' + links[this.x] + '">original link</a>',
+                                    width: 200
+                                });
+                            }
+                        }
+                    },
+                    marker: {
+                        lineWidth: 1
+                    }
+                }
+            },
+    
+            series: [{
+                name: 'Checkins',
+                lineWidth: 4,
+                marker: {
+                    radius: 4
+                }
+            }
+            ]
+        };
+    
+    
+        // Load data asynchronously using jQuery. On success, add the data
+        // to the options and timeiate the chart.
+        // This data is obtained by exporting a GA custom report to TSV.
+        // http://api.jquery.com/jQuery.get/
+        checkins = [];
+
+        text = jQuery.parseJSON('{{ checkin_json|safe }}')
+
+            i = 0;
+            time = text[0][0]
+            counter = 0; 
+            while(i<text.length) {
+                if (text[i][0] < (time + bucket_size)) {
+                   counter++; 
+                } else {
+                    checkins.push([time, counter]);
+                    counter = 1;
+                }
+                key = text[i][0];
+                lats[key] = text[i][1].lat;
+                longs[key] = text[i][1].lng;
+                links[key] = text[i][1].link;
+                time = key;
+                i++;
+            }
+                options.series[0].data = checkins;
+                chart = new Highcharts.Chart(options);
+            
+        });
+    });
+        
     </script>
     </head>
         <body>
         <div id="container" style="min-width: 400px; height: 400px; margin: 0 auto"></div>
+        <div id="container-checkin" style="min-width: 400px; height: 400px; margin: 0 auto"></div>
         </body>
 </html>
