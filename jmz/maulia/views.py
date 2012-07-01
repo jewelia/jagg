@@ -5,7 +5,7 @@ import urllib
 import urllib2
 import json
 
-singly_code = ''
+singly_access_token = ''
 
 def index(request):
     return render_to_response('singly.html',
@@ -55,35 +55,35 @@ def connect_to_service(request):
         a_data = a_response.read()
 
         a_json = json.loads(a_data)
+        print a_json
 
-        count = 0
-        while count < len(a_json):
-            try:
-                if a_json['twitter']:
-                    twitter = True
-            except KeyError:
-                twitter = False
-            try:
-                if a_json['facebook']:
-                    facebook = True
-            except KeyError:
+        try:
+            if a_json['twitter']:
+                twitter = True
+        except KeyError:
+            twitter = False
+        try:
+            if a_json['facebook']:
+                facebook = True
+        except KeyError:
                 facebook = False
-            count += 1
-            try:
-                if a_json['linkedin']:
-                    linkedin = True
-            except KeyError:
-                linkedin = False
-            try:
-                if a_json['foursquare']:
-                    foursquare = True
-            except KeyError:
-                foursquare = False
-            try:
-                if a_json['instagram']:
-                    instagram = True
-            except KeyError:
-                instagram = False
+        try:
+            if a_json['linkedin']:
+                linkedin = True
+        except KeyError:
+            linkedin = False
+        try:
+            if a_json['foursquare']:
+                foursquare = True
+        except KeyError:
+            foursquare = False
+        try:
+            if a_json['instagram']:
+                instagram = True
+        except KeyError:
+            instagram = False
+            
+        print "Instagram " + str(instagram)
 
     return render_to_response('singly.html',
                               { 'instagram': instagram,
