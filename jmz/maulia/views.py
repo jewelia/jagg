@@ -41,11 +41,11 @@ def connect_to_service(request):
     access_token = access_token_json['access_token']
     print("Access token is %s" % (access_token, ))
 
-    
+
     api_request_profiles = SINGLY_PROFILES + '?access_token=' + access_token
-    
+
     request.session['REQ_TOKEN_SESSION_KEY'] = access_token
-    
+
     all_api_calls = {'profile': api_request_profiles}
 
     for key in all_api_calls.keys():
@@ -82,7 +82,7 @@ def connect_to_service(request):
                 instagram = True
         except KeyError:
             instagram = False
-            
+
     return render_to_response('singly.html',
                               { 'instagram': instagram,
                                'facebook' : facebook,
@@ -93,45 +93,12 @@ def connect_to_service(request):
 
 def singly_authorize(request):
     access_token = request.session['REQ_TOKEN_SESSION_KEY']
-    
+
     SINGLY_PROFILES = 'https://api.singly.com/v0/profiles'
 
     SINGLY_PHOTOS= 'https://api.singly.com/v0/types/photos'
     SINGLY_CHECKINS = 'https://api.singly.com/v0/types/checkins'
     SINGLY_STATUS = 'https://api.singly.com/v0/types/statuses'
-    '''
-    SINGLY_ACCESS_TOKEN_URL = 'https://api.singly.com/oauth/access_token'
-    FOURSQUARE = 'https://api.singly.com/v0/services/foursquare/checkins'
-
-    # Get singly access code
-    code = request.GET.get("code")
-    print("OAuth code is %s" % (code, ))
-
-    post_params = {
-        'client_id' : settings.SINGLY_CLIENT_ID,
-        'client_secret' : settings.SINGLY_CLIENT_SECRET,
-        'code': code
-        }
-    post_data = urllib.urlencode(post_params)
-
-    print "Calling %s with params %s" % (SINGLY_ACCESS_TOKEN_URL, post_data)
-    request2 = urllib2.Request(SINGLY_ACCESS_TOKEN_URL, post_data)
-    response2 = urllib2.urlopen(request2)
-
-    access_token_data = response2.read()
-    print("Access token response data is %s" % (access_token_data, ))
-
-    access_token_json = json.loads(access_token_data)
-    access_token = access_token_json['access_token']
-    print("Access token is %s" % (access_token, ))
-
-    get_params = {
-        'data' : 'true',
-        'access_token' : access_token
-        }
-
-    get_data = urllib.urlencode(get_params)
-    '''
 
     #1 Fetch Profile Data
     api_request_profiles = SINGLY_PROFILES + '?access_token=' + access_token
@@ -175,14 +142,9 @@ def singly_authorize(request):
                 oembed_obj = a_json[count]['oembed']
                 date_obj = a_json[count]['at']
                 if str(date_obj).startswith('12', 0):
+                    #adjust older dates to make graphs a little better
                     date_obj += 13744850000
-                    #date_list = list(str(date_obj))
-                    #date_list[0:1] = '13'
-                    #date_obj = ''.join(date_list)
-                #if key == 'photo':
-                #    print date_obj
 
-                
                 try:
                     if oembed_obj['provider_name']:
                         source = oembed_obj['provider_name']
@@ -233,7 +195,7 @@ def singly_authorize(request):
                             if a_json[count]['data']['actions'][0]['name']:
                                 if a_json[count]['data']['actions'][0]['name'] == 'Comment':
                                     link = a_json[count]['data']['actions'][0]['link']
-                        elif a_json[count]['idr'].find('twitter') > 0:
+                        elif type == 'twitter':
                             link = 'http://www.twitter.com/' + a_json[count]['data']['user']['screen_name'] + '/status/' + a_json[count]['data']['id_str']
                     elif key == 'checkin' or key == 'foursquare':
                         if type == 'foursquare':
@@ -249,9 +211,11 @@ def singly_authorize(request):
                         if oembed_obj['url']:
                             data = oembed_obj['url']
                             images_array.append(data)
-                    elif key == 'status': 
+                    elif key == 'status':
                         if oembed_obj['text']:
                             data = 'status'
+                            data.replace("'", "")
+
                             '''
                             d = oembed_obj['text']
                             if (not 'run' in d) and (not 'Neela' in d):
@@ -265,6 +229,7 @@ def singly_authorize(request):
                     elif key == 'checkin' or key == 'foursquare':
                         if oembed_obj['title']:
                             data = oembed_obj['title']
+                            data = data.replace("'", "")
 
                 except KeyError:
                     data = ''
@@ -312,7 +277,7 @@ def singly_authorize(request):
                 scrubbed_status_data = json.JSONEncoder().encode(json_array)
                 num_status = str(len(json_array))
 
-    
+
     #return render_to_response('data.html',
     return render_to_response('charts.html',
                               {'num_photos' : num_photos,
